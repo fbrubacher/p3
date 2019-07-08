@@ -56,12 +56,27 @@ class CryptoProject(object):
         p = 0
         q = 0
 
+        root = int(math.sqrt(n))
+        if (root % 2 == 0):
+            root = root -1
+        c = root
+        for c in range(root, 0, -2):
+            if (n % c == 0):
+                p = c
+                break
+        q = int(n/p)
         return p, q
 
     def get_private_key_from_p_q_e(self, p, q, e):
         # TODO: Implement this function for Task 3
         d = 0
-
+        p = p -1
+        q = q -1
+        phi_n = p * q
+        temp = 1
+        while(temp % e > 0):
+            temp += phi_n
+            d = temp // e
         return d
 
     def is_waldo(self, n1, n2):
