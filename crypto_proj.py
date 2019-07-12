@@ -79,13 +79,23 @@ class CryptoProject(object):
 
     def is_waldo(self, n1, n2):
         # TODO: Implement this function for Task 4
-        result = False
-
+        if (math.gcd(n1,n2) != 1):
+            result = True
         return result
 
     def get_private_key_from_n1_n2_e(self, n1, n2, e):
-        # TODO: Implement this function for Task 4
         d = 0
+
+        #your code starts here
+        p = math.gcd(n1,n2)
+        q = int(n1//p)
+
+        phi = (p-1) * (q-1)
+        temp = 1
+        while(temp % e > 0):
+            temp += phi
+            d = temp // e
+        #your code ends here
 
         return d
 
