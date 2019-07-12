@@ -11,7 +11,7 @@ class CryptoProject(object):
     def __init__(self):
         # TODO: Change this to YOUR Georgia Tech student ID!!!
         # Note that this is NOT your 9-digit Georgia Tech ID
-        self.student_id = 'bdornier3'  # for test_crypto_proj_1.py
+        self.student_id = 'fbl3'  # for test_crypto_proj_1.py
         # self.student_id = 'ctaylor'  # for test_crypto_proj_2.py
 
     def get_student_id_hash(self):
@@ -52,7 +52,6 @@ class CryptoProject(object):
         return password, salt
 
     def get_factors(self, n):
-        # TODO: Implement this function for Task 3
         p = 0
         q = 0
 
@@ -68,15 +67,14 @@ class CryptoProject(object):
         return p, q
 
     def get_private_key_from_p_q_e(self, p, q, e):
-        # TODO: Implement this function for Task 3
         d = 0
         p = p -1
         q = q -1
-        phi_n = p * q
-        temp = 1
-        while(temp % e > 0):
-            temp += phi_n
-            d = temp // e
+        mul = p * q
+        stop = 1
+        while(stop % e > 0):
+            stop += mul
+            d = math.floor(stop / e)
         return d
 
     def is_waldo(self, n1, n2):
