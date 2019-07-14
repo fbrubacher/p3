@@ -11,7 +11,7 @@ class CryptoProject(object):
     def __init__(self):
         # TODO: Change this to YOUR Georgia Tech student ID!!!
         # Note that this is NOT your 9-digit Georgia Tech ID
-        self.student_id = 'fbl3'  # for test_crypto_proj_1.py
+        self.student_id = 'bdornier3'  # for test_crypto_proj_1.py
         # self.student_id = 'ctaylor'  # for test_crypto_proj_2.py
 
     def get_student_id_hash(self):
