@@ -44,22 +44,16 @@ class CryptoProject(object):
         _, inv, _ = self.extended_gcd(a, m)
         return ((inv % m) + m) % m
 
-    def find_cubic_root(self, n):
-        lower, upper = 0, n
-        cube = 0
-        while upper - lower > 1:
-            mid = (lower + upper) // 2
-            cube = mid ** 3
-            if cube == n:
-                return mid
-            elif n < cube:
-                upper = mid
+    def cube_root(self, n):
+        low = 0
+        high = n
+        while low < high:
+            mid = (low+high)//2
+            if mid**3 < n:
+                low = mid+1
             else:
-                lower = mid+1
-        if upper == lower:
-            raise Exception('Cube root not found!')
-        else:
-            return lower
+                high = mid
+        return low
     # END HELPER FUNCTIONS
 
     def decrypt_message(self, N, e, d, c):
@@ -115,18 +109,17 @@ class CryptoProject(object):
         return d
 
     def recover_msg(self, N1, N2, N3, C1, C2, C3):
-        Y1 = N2 * N3
-        _, inv, _ = self.extended_gcd(Y1, N1)
-        Z1 = ((inv % N1) + N1) % N1
-        Y2 = N1 * N3
-        _, inv, _ = self.extended_gcd(Y2, N2)
-        Z2 = ((inv % N2) + N2) % N2
-        Y3 = N1 * N2
-        _, inv, _ = self.extended_gcd(Y3, N3)
-        Z3 = ((inv % N3) + N3) % N3
+        _, inv, _ = self.extended_gcd(N2 * N3, N1)
+        res1 = ((inv % N1) + N1) % N1
+        _, inv, _ = self.extended_gcd(N1 * N3, N2)
+        res2 = ((inv % N2) + N2) % N2
+        _, inv, _ = self.extended_gcd(N1 * N2, N3)
+        res3 = ((inv % N3) + N3) % N3
 
-        C = (C1 * Y1 * Z1 + C2 * Y2 * Z2 + C3 * Y3 * Z3) % (N1 * N2 * N3)
-        return self.find_cubic_root(C)
+        N = (N1 * N2 * N3)
+        Cs = (C1 * N2 * N3 * res1 + C2 * N1 * N3 * res2 + C3 * N1 * N2 * res3)
+        C = Cs % N
+        return self.cube_root(C)
 
     def task_1(self):
         data = self.get_data_from_json_for_student('keys4student_task_1.json')
