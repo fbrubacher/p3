@@ -34,17 +34,15 @@ class CryptoProject(object):
             return data[name]
 
     # BEGIN HELPER FUNCTIONS
-    def extended_gcd(self, a, b):
+    def euclidian(self, a, b):
         if a == 0:
             return (b, 0, 1)
-        g, x, y = self.extended_gcd(b % a, a)
-        return (g, y - x * (b // a), x)
+        g, x, y = self.euclidian(b % a, a)
+        new_x =  y - x 
+        new_x = y - x * (b // a)
+        return (g, new_x, x)
 
-    def find_modulo_inverse(self,a, m):
-        _, inv, _ = self.extended_gcd(a, m)
-        return ((inv % m) + m) % m
-
-    def cube_root(self, n):
+    def root_bs(self, n):
         low = 0
         high = n
         while low < high:
@@ -62,12 +60,11 @@ class CryptoProject(object):
         return m
 
     def crack_password_hash(self, password_hash, weak_password_list):
-        # TODO: Implement this function for Task 2
-        for password in weak_password_list:
-            for salt in weak_password_list:
-                 hashed_password = hashlib.sha256(password.encode() + salt.encode()).hexdigest()
-                 if hashed_password == password_hash:
-                    return password, salt
+        for p in weak_password_list:
+            for s in weak_password_list:
+                 hp = hashlib.sha256(p.encode() + s.encode()).hexdigest()
+                 if hp == password_hash:
+                    return p, s
 
     def get_factors(self, n):
         p = 0
@@ -88,38 +85,38 @@ class CryptoProject(object):
         p = p -1
         q = q -1
         phi = p * q
-        _, inv, _ = self.extended_gcd(e, phi)
-        res = ((inv % phi) + phi) % phi
+        _, i, _ = self.euclidian(e, phi)
+        res = ((i % phi) + phi) % phi
         return res
 
     def is_waldo(self, n1, n2):
-        p, _, _ = self.extended_gcd(n1, n2) 
+        p, _, _ = self.euclidian(n1, n2) 
         return p > 1
 
 
     def get_private_key_from_n1_n2_e(self, n1, n2, e):
-        p, _, _ = self.extended_gcd(n1, n2) 
+        p, _, _ = self.euclidian(n1, n2) 
         q = n1 // p
         p = p - 1
         q = q - 1
         phi = p * q
-        _, d, _ = self.extended_gcd(e, phi)
+        _, d, _ = self.euclidian(e, phi)
         return ((d % phi) + phi) % phi
 
         return d
 
     def recover_msg(self, N1, N2, N3, C1, C2, C3):
-        _, inv, _ = self.extended_gcd(N2 * N3, N1)
+        _, inv, _ = self.euclidian(N2 * N3, N1)
         res1 = ((inv % N1) + N1) % N1
-        _, inv, _ = self.extended_gcd(N1 * N3, N2)
+        _, inv, _ = self.euclidian(N1 * N3, N2)
         res2 = ((inv % N2) + N2) % N2
-        _, inv, _ = self.extended_gcd(N1 * N2, N3)
+        _, inv, _ = self.euclidian(N1 * N2, N3)
         res3 = ((inv % N3) + N3) % N3
 
         N = (N1 * N2 * N3)
         Cs = (C1 * N2 * N3 * res1 + C2 * N1 * N3 * res2 + C3 * N1 * N2 * res3)
         C = Cs % N
-        return self.cube_root(C)
+        return self.root_bs(C)
 
     def task_1(self):
         data = self.get_data_from_json_for_student('keys4student_task_1.json')
