@@ -33,23 +33,48 @@ class CryptoProject(object):
         else:
             return data[name]
 
-    # TODO: OPTIONAL - Add helper functions below
     # BEGIN HELPER FUNCTIONS
+    def extended_gcd(a, b):
+        if a == 0:
+            return (b, 0, 1)
+        g, x, y = extended_gcd(b % a, a)
+        return (g, y - x * (b // a), x)
+
+    # def find_modulo_inverse(a, m):
+    #     _, inv, _ = extended_gcd(a, m)
+    #     return ((inv % m) + m) % m
+
+    def find_cubic_root(n):
+        lower, upper = 0, n
+        cube = 0
+        while upper - lower > 1:
+            mid = (lower + upper) // 2
+            cube = mid ** 3
+            if cube == n:
+                return mid
+            elif n < cube:
+                upper = mid
+            else:
+                lower = mid+1
+        if upper == lower:
+            raise Exception('Cube root not found!')
+        else:
+            return lower
     # END HELPER FUNCTIONS
 
     def decrypt_message(self, N, e, d, c):
         # TODO: Implement this function for Task 1
-        m = 0
+        m = hex(pow(c, d, N))
 
         return hex(m).rstrip('L')
 
     def crack_password_hash(self, password_hash, weak_password_list):
         # TODO: Implement this function for Task 2
-        password = 'abc'
-        salt = '123'
-        hashed_password = hashlib.sha256(password.encode() + salt.encode()).hexdigest()
-
-        return password, salt
+        for password in weak_password_list:
+            for salt in weak_password_list:
+                 hashed_password = hashlib.sha256(password.encode() + salt.encode()).hexdigest()
+                 if hashed_password == password_hash:
+                    return password, salt
 
     def get_factors(self, n):
         p = 0
@@ -67,15 +92,11 @@ class CryptoProject(object):
         return p, q
 
     def get_private_key_from_p_q_e(self, p, q, e):
-        d = 0
         p = p -1
         q = q -1
-        mul = p * q
-        stop = 1
-        while(stop % e > 0):
-            stop += mul
-            d = math.floor(stop / e)
-        return d
+        phi = p * q
+        _, inv, _ = extended_gcd(e, phi)
+        res = ((inv % phi) + phi) % phi
 
     def is_waldo(self, n1, n2):
         # TODO: Implement this function for Task 4
@@ -84,27 +105,25 @@ class CryptoProject(object):
         return result
 
     def get_private_key_from_n1_n2_e(self, n1, n2, e):
-        d = 0
-
-        #your code starts here
-        p = math.gcd(n1,n2)
-        q = int(n1//p)
-
-        phi = (p-1) * (q-1)
-        temp = 1
-        while(temp % e > 0):
-            temp += phi
-            d = temp // e
-        #your code ends here
+        p, _, _ = self.extended_gcd(n1, n2) 
+        q = n1 // p
+        p = p - 1
+        q = q - 1
+        phi = p * q
+        _, d, _ = self.extended_gcd(e, phi)
+        return ((d % phi) + phi) % phi
 
         return d
 
     def recover_msg(self, N1, N2, N3, C1, C2, C3):
-        # TODO: Implement this function for Task 5
-        m = 42
-        # Note that 'm' should be an integer
-
-        return m
+        Y1 = N2 * N3
+        Z1 = self.find_modulo_inverse(Y1, N1)
+        Y2 = N1 * N3
+        Z2 = self.find_modulo_inverse(Y2, N2)
+        Y3 = N1 * N2
+        Z3 = self.find_modulo_inverse(Y3, N3)
+        C = (C1 * Y1 * Z1 + C2 * Y2 * Z2 + C3 * Y3 * Z3) % (N1 * N2 * N3)
+        return self.find_cubic_root(C)
 
     def task_1(self):
         data = self.get_data_from_json_for_student('keys4student_task_1.json')
