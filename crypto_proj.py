@@ -96,6 +96,7 @@ class CryptoProject(object):
         phi = p * q
         _, inv, _ = self.extended_gcd(e, phi)
         res = ((inv % phi) + phi) % phi
+        return res
 
     def is_waldo(self, n1, n2):
         p, _, _ = self.extended_gcd(n1, n2) 
