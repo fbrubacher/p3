@@ -34,17 +34,17 @@ class CryptoProject(object):
             return data[name]
 
     # BEGIN HELPER FUNCTIONS
-    def extended_gcd(a, b):
+    def extended_gcd(self, a, b):
         if a == 0:
             return (b, 0, 1)
-        g, x, y = extended_gcd(b % a, a)
+        g, x, y = self.extended_gcd(b % a, a)
         return (g, y - x * (b // a), x)
 
     # def find_modulo_inverse(a, m):
     #     _, inv, _ = extended_gcd(a, m)
     #     return ((inv % m) + m) % m
 
-    def find_cubic_root(n):
+    def find_cubic_root(self, n):
         lower, upper = 0, n
         cube = 0
         while upper - lower > 1:
@@ -65,8 +65,7 @@ class CryptoProject(object):
     def decrypt_message(self, N, e, d, c):
         # TODO: Implement this function for Task 1
         m = hex(pow(c, d, N))
-
-        return hex(m).rstrip('L')
+        return m
 
     def crack_password_hash(self, password_hash, weak_password_list):
         # TODO: Implement this function for Task 2
@@ -95,14 +94,13 @@ class CryptoProject(object):
         p = p -1
         q = q -1
         phi = p * q
-        _, inv, _ = extended_gcd(e, phi)
+        _, inv, _ = self.extended_gcd(e, phi)
         res = ((inv % phi) + phi) % phi
 
     def is_waldo(self, n1, n2):
-        # TODO: Implement this function for Task 4
-        if (math.gcd(n1,n2) != 1):
-            result = True
-        return result
+        p, _, _ = self.extended_gcd(n1, n2) 
+        return p > 1
+
 
     def get_private_key_from_n1_n2_e(self, n1, n2, e):
         p, _, _ = self.extended_gcd(n1, n2) 
@@ -117,11 +115,14 @@ class CryptoProject(object):
 
     def recover_msg(self, N1, N2, N3, C1, C2, C3):
         Y1 = N2 * N3
-        Z1 = self.find_modulo_inverse(Y1, N1)
+        _, inv, _ = self.extended_gcd(Y1, N1)
+        Z1 = ((inv % N1) + N1) % N1
         Y2 = N1 * N3
-        Z2 = self.find_modulo_inverse(Y2, N2)
+        _, inv, _ = self.extended_gcd(Y2, N2)
+        Z2 = ((inv % N2) + N2) % N2
         Y3 = N1 * N2
-        Z3 = self.find_modulo_inverse(Y3, N3)
+        _, inv, _ = self.extended_gcd(Y2, N3)
+        Z3 = ((inv % N3) + N3) % N3
         C = (C1 * Y1 * Z1 + C2 * Y2 * Z2 + C3 * Y3 * Z3) % (N1 * N2 * N3)
         return self.find_cubic_root(C)
 
