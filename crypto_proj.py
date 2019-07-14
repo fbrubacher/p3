@@ -40,9 +40,9 @@ class CryptoProject(object):
         g, x, y = self.extended_gcd(b % a, a)
         return (g, y - x * (b // a), x)
 
-    # def find_modulo_inverse(a, m):
-    #     _, inv, _ = extended_gcd(a, m)
-    #     return ((inv % m) + m) % m
+    def find_modulo_inverse(self,a, m):
+        _, inv, _ = self.extended_gcd(a, m)
+        return ((inv % m) + m) % m
 
     def find_cubic_root(self, n):
         lower, upper = 0, n
@@ -121,8 +121,9 @@ class CryptoProject(object):
         _, inv, _ = self.extended_gcd(Y2, N2)
         Z2 = ((inv % N2) + N2) % N2
         Y3 = N1 * N2
-        _, inv, _ = self.extended_gcd(Y2, N3)
+        _, inv, _ = self.extended_gcd(Y3, N3)
         Z3 = ((inv % N3) + N3) % N3
+
         C = (C1 * Y1 * Z1 + C2 * Y2 * Z2 + C3 * Y3 * Z3) % (N1 * N2 * N3)
         return self.find_cubic_root(C)
 
